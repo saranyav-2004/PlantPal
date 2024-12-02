@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PlantPal:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PlantPal_jar</output-path>
+    <root id="archive" name="PlantPal.jar">
+      <element id="module-output" name="PlantPal" />
+    </root>
+  </artifact>
+</component>
