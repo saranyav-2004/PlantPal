@@ -1,23 +1,21 @@
-// Import necessary classes from Swing, AWT, and event libraries
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
 
-// GamePanel class handles the main game mechanics and display
 public class GamePanel extends JPanel implements ActionListener {
-    // Constants for screen dimensions and game settings
+    //  screen dimensions
     static final int SCREEN_WIDTH = 600;
     static final int SCREEN_HEIGHT = 600;
     static final int UNIT_SIZE = 5;
     static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
     static final int DELAY = 75;
 
-    // Arrays to hold x and y coordinates for the plant's parts
+    // Arrays for the plant's parts
     final int[] x = new int[GAME_UNITS];
     final int[] y = new int[GAME_UNITS];
 
-    // Initial plant parts count and score
+    // Initial plant parts count
     int plantParts = 40;
     int waterTaken;
 
@@ -31,113 +29,114 @@ public class GamePanel extends JPanel implements ActionListener {
     // Game status
     boolean running = false;
 
-    // Timer for game updates and random generator for water position
+    // Timer for game and random generator for water position
     Timer timer;
     Random random;
 
     // Constructor for GamePanel
     GamePanel() {
-        // Initialize random object
+
         random = new Random();
 
-        // Set panel properties
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.black);
         this.setFocusable(true);
-
-        // Add a KeyListener for controlling the snake
+        //  KeyListener
         this.addKeyListener(new MyKeyAdapter());
-
         // Start the game
         startGame();
     }
 
-    // Starts the game by creating a new water and setting game state
+    // Starts the game
     public void startGame() {
         newWater();
         running = true;
 
-        // Start the timer with a delay
         timer = new Timer(DELAY, this);
         timer.start();
     }
 
-    // Override paintComponent to draw elements on the panel
+    // Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         draw(g);
     }
 
-    // Draws game elements: water, plant, and score
-    //graphics for body with curves like vineyard
+
+
     public void draw(Graphics g) {
         if (running) {
-            // Draw water drop with a larger, oval shape for a more droplet-like appearance
-            int dropletWidth = UNIT_SIZE * 2;  // Make the droplet wider
-            int dropletHeight = UNIT_SIZE * 3; // Make the droplet taller for a teardrop effect
+            //waterdroplet size
+            int dropletWidth = UNIT_SIZE * 2;
+            int dropletHeight = UNIT_SIZE * 3;
             g.setColor(Color.blue);
             g.fillOval(waterX - dropletWidth / 4, waterY - dropletHeight / 4, dropletWidth, dropletHeight);
 
-            // Draw the plant's head based on waterTaken value
+            // plant's head based on waterTaken value
             g.setColor(Color.green);
             g.fillRect(x[0], y[0], UNIT_SIZE, UNIT_SIZE);
 
             if (waterTaken > 2) {
-                // Draw full flower with petals
-                int flowerSize = UNIT_SIZE * 3; // Flower size
-                g.setColor(new Color(255, 105, 180)); // Color for the flower (pink)
+                // flower dimensions
+                int flowerSize = UNIT_SIZE * 3;
+                g.setColor(new Color(255, 105, 180));
 
-                // Draw petals around the flower center
-                for (int i = 0; i < 8; i++) { // Create 8 petals
-                    double angle = Math.PI / 4 * i; // Angle for each petal
+
+                for (int i = 0; i < 8; i++) {
+                    double angle = Math.PI / 4 * i;
                     int petalX = (int) (x[0] - flowerSize / 2 + flowerSize / 1.5 * Math.cos(angle));
                     int petalY = (int) (y[0] - flowerSize / 2 + flowerSize / 1.5 * Math.sin(angle));
                     g.fillOval(petalX, petalY, flowerSize / 2, flowerSize / 2); // Petal size
                 }
-                // Draw the center of the flower
+                // center of the flower
                 g.setColor(Color.yellow);
                 g.fillOval(x[0] - flowerSize / 6, y[0] - flowerSize / 6, flowerSize / 3, flowerSize / 3); // Center of the flower
             } else if (waterTaken > 1) {
-                // Draw bud with green petals
-                int budSize = UNIT_SIZE * 2; // Bud size
-                g.setColor(new Color(0, 128, 0)); // Petal color (green)
+                // bud
+                int budSize = UNIT_SIZE * 2;
+                g.setColor(new Color(0, 128, 0));
 
-                // Draw petals around the bud center
-                for (int i = 0; i < 5; i++) { // Create 5 petals
-                    double angle = Math.PI / 2.5 * i; // Angle for each petal
+                //  petals around the bud center
+                for (int i = 0; i < 5; i++) {
+                    double angle = Math.PI / 2.5 * i;
                     int petalX = (int) (x[0] - budSize / 2 + budSize / 1.5 * Math.cos(angle));
                     int petalY = (int) (y[0] - budSize / 2 + budSize / 1.5 * Math.sin(angle));
-                    g.fillOval(petalX, petalY, budSize / 2, budSize / 2); // Bud petals
+                    g.fillOval(petalX, petalY, budSize / 2, budSize / 2);
                 }
-                // Draw the center of the bud
-                g.setColor(Color.green); // Color for the bud itself
-                g.fillOval(x[0] - budSize / 4, y[0] - budSize / 4, budSize / 2, budSize / 2); // Bud center
+                // center of the bud
+                g.setColor(Color.green);
+                g.fillOval(x[0] - budSize / 4, y[0] - budSize / 4, budSize / 2, budSize / 2);
             } else {
-                // Draw seed
-                int seedSize = UNIT_SIZE*2; // Seed size
-                g.setColor(new Color(139, 69, 19)); // Seed color (brown)
-                g.fillOval(x[0] - seedSize / 2, y[0] - seedSize / 2, seedSize, seedSize); // Draw seed
+                // seed
+                int seedSize = UNIT_SIZE*2;
+                g.setColor(new Color(139, 69, 19));
+                g.fillOval(x[0] - seedSize / 2, y[0] - seedSize / 2, seedSize, seedSize);
             }
 
-            // Draw the plant's body with a wiggling effect and leaves
+            // plant's body with wiggling effect
             for (int i = 1; i < plantParts; i++) {
-                // Create a sine wave offset for the body parts
-                double angle = i * 0.5;  // Adjust the frequency of the wiggle here
-                int offsetX = (int) (Math.sin(angle) * UNIT_SIZE / 2); // Adjust amplitude if needed
+
+                double angle = i * 0.5;
+                int offsetX = (int) (Math.sin(angle) * UNIT_SIZE / 2);
                 int offsetY = (int) (Math.cos(angle) * UNIT_SIZE / 2);
 
-                // Draw each segment with the oscillating offset
                 g.setColor(new Color(45, 180, 0));
                 g.fillRect(x[i] + offsetX, y[i] + offsetY, UNIT_SIZE, UNIT_SIZE);
 
-                // Draw leaves on alternating segments
                 if (i % 2 == 0) {
                     g.setColor(Color.green);
-                    // Draw leaf shapes (more elongated and leaf-like)
                     g.fillOval(x[i] + UNIT_SIZE / 2 + offsetX, y[i] + offsetY, UNIT_SIZE / 3, UNIT_SIZE / 5); // Left leaf
                     g.fillOval(x[i] + offsetX, y[i] + UNIT_SIZE / 2 + offsetY, UNIT_SIZE / 3, UNIT_SIZE / 5); // Right leaf
                 }
             }
+
+
+            if (underwater) {
+                g.setColor(Color.cyan);
+                g.setFont(new Font("Ink Free", Font.BOLD, 30));
+                g.drawString("Underwater Level!", SCREEN_WIDTH / 3, 50);
+            }
+
 
             // Display score
             g.setColor(Color.red);
@@ -149,7 +148,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    /* //flower is nice and funny idc anymore
+    /* //flower is cuteee
     public void draw(Graphics g) {
         if (running) {
             // Draw water drop with a larger, oval shape for a more droplet-like appearance
@@ -395,20 +394,18 @@ public class GamePanel extends JPanel implements ActionListener {
          }
      }
  */
-    // Generates a new water at a random location
     public void newWater() {
         waterX = random.nextInt((int)(SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
         waterY = random.nextInt((int)(SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
     }
 
-    // Moves the plant in the current direction
+    // Move
     public void move() {
         for (int i = plantParts; i > 0; i--) {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
         }
 
-        // Change head position based on direction
         switch (direction) {
             case 'U':
                 y[0] = y[0] - UNIT_SIZE;
@@ -425,16 +422,24 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    // Checks if the plant has taken an water
+    boolean underwater = false;
+
     public void checkWater() {
         if ((x[0] == waterX) && (y[0] == waterY)) {
             plantParts++;
             waterTaken++;
             newWater();
+
+            if (waterTaken == 3) {
+                underwater = true; // activate underwater mode
+                setBackground(new Color(0, 0, 128)); // Change background to underwater color
+            } else if (waterTaken == 4) {
+                running = false; // Stop the game
+            }
         }
     }
 
-    // Checks if the plnat has collided with itself or the borders
+
     public void checkCollisions() {
         // Check collision with body
         for (int i = plantParts; i > 0; i--) {
@@ -442,34 +447,43 @@ public class GamePanel extends JPanel implements ActionListener {
                 running = false;
             }
         }
-
-        // Check collision with left, right, top, and bottom borders
+        // Check collision borders
         if (x[0] < 0 || x[0] > SCREEN_WIDTH || y[0] < 0 || y[0] > SCREEN_HEIGHT) {
             running = false;
         }
-
-        // Stop the timer if the game is not running
         if (!running) {
             timer.stop();
         }
     }
 
-    // Displays Game Over screen
+    // Displays Game Over on the screen
     public void gameOver(Graphics g) {
-        // Display score
+        if (waterTaken == 4) {
+            g.setColor(Color.blue);
+            g.setFont(new Font("Ink Free", Font.BOLD, 40));
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            g.drawString("You've reached the water limit!", (SCREEN_WIDTH - metrics.stringWidth("You've reached the water limit!")) / 2, SCREEN_HEIGHT / 2);
+        } else {
+            g.setColor(Color.red);
+            g.setFont(new Font("Ink Free", Font.BOLD, 75));
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            g.drawString("Game Over", (SCREEN_WIDTH - metrics.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
+        }
+    }
+  /*  public void gameOver(Graphics g) {
+  //score
         g.setColor(Color.red);
         g.setFont(new Font("Ink Free", Font.BOLD, 40));
         FontMetrics metrics1 = getFontMetrics(g.getFont());
         g.drawString("Score: " + waterTaken, (SCREEN_WIDTH - metrics1.stringWidth("Score: " + waterTaken)) / 2, g.getFont().getSize());
-
-        // Display Game Over text
+        // Game Over text
         g.setColor(Color.red);
         g.setFont(new Font("Ink Free", Font.BOLD, 75));
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
     }
-
-    // Action performed with each timer tick (move, check water, check collisions)
+*/
+    // Action performed(move, check water, check collisions)
     public void actionPerformed(ActionEvent e) {
         if (running) {
             move();
@@ -479,7 +493,7 @@ public class GamePanel extends JPanel implements ActionListener {
         repaint();
     }
 
-    // Inner class for handling key events
+    // Inner class
     public class MyKeyAdapter extends KeyAdapter {
         // Change direction based on arrow key input
         public void keyPressed(KeyEvent e) {
