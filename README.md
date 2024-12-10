@@ -9,7 +9,7 @@ The Abstract Window Toolkit (AWT) Library
 Java Swing
 Random (which is a class in java part of the java.util package)
 
-       Preferred software : Intellij IDEA or any software compatible with JDK.
+Preferred software : Intellij IDEA or any software compatible with JDK.
 
 Instructions to set up and run if using Intellij IDEA
 
@@ -19,8 +19,8 @@ Step 1: Clone the repository:
 Use the following commands to clone the repository.
 
         git clone https://github.com/saranyaav-2004/PlantPal.git
-cd PlantPal
-        Step 2: Open the project in IntelliJ IDEA by following these instructions
+        cd PlantPal
+ Step 2: Open the project in IntelliJ IDEA by following these instructions
 Launch IntelliJ IDEA.
 Click on File > Open.
 Select the PlantPal directory and click OK.
